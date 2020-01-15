@@ -4,6 +4,24 @@ An impossibly simple Python binding to the Windows Ehome CIR Remote API
 Still being developed. at the present time most of the code has been completed. just need to 
 iron out any possible bugs.
 
+
+
+#### ***Updates***
+
+---------------------------------
+
+* Instance Singleton: only one instance of an IRDevice class can exist per device. This 
+  will stop any possibility of having more then a single handle to a device created.
+
+* Removes close() method: There is no longer a need to close a device. The closing of the
+  handle gets done by reference count. This may add a smidge of additional overhead
+  but the benifits of making sure that handle gets closed outweigh the tiny expense 
+  of the new mechanism.
+  You will however need to call `stop_receive()` if you called `start_receive()`
+  
+* Adds Setup.py: Adds the setup program.
+    
+   
 #### ***Requirements***
 
 ---------------------------------
@@ -101,14 +119,7 @@ a list of `pyWinMCERemote.ioctl.IRDevice` instances.
     
     The `timeout` parameter is how long to keep on trying to get a sucessfull code for. the default 
     value is 10 seconds.   
-   
-  * close(): you MUST call this whn not using the device anymore. If you do not call this the memory used
-    in the API for the device will not get released. I have added calling this method if an instance no 
-    longer has a reference held anywhere and it gets garbage collected. I do not know the extent of the 
-    Python GC routine so I do not know if a GC occurs when python gets closed. You do not have to worry 
-    about stopping the receive thread before you call this method. it will stop the thread if it is not 
-    already stopped.   
-    
+  
   * reset(): "reboots" the physical device
 
   * bind(callback): attaches a function to be used to notify an application of a received ir code.

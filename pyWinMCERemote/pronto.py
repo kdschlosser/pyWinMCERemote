@@ -16,7 +16,19 @@
 # You should have received a copy of the GNU General Public License along
 # with EventGhost. If not, see <http://www.gnu.org/licenses/>.
 
-from struct import unpack_from, unpack, pack
+"""
+This file is part of the **pyWinMCERemote**
+project https://github.com/kdschlosser/pyWinMCERemote
+
+:platform: Windows
+:license: GPL version 2 or newer
+:synopsis: pronto encoder/decoder
+
+.. moduleauthor:: Kevin Schlosser @kdschlosser <kevin.g.schlosser@gmail.com>
+"""
+
+
+from struct import pack
 
 pronto_clock = 0.241246
 SignalFree = 10000
@@ -24,7 +36,24 @@ SignalFreeRC6 = 2700
 RC6Start = [2700, -900, 450, -900, 450, -450, 450, -450, 450, -450]
 RC6AStart = [3150, -900, 450, -450, 450, -450, 450, -900, 450]
 
-
+#
+# def pronto_raw_to_ir(code):
+#     code = code.split(' ')
+#
+#     preamble = code[:4]
+#     pronto_carrier = int('0x' + preamble[1], 16)
+#     carrier = pronto_carrier * pronto_clock
+#     raw = []
+#
+#     if int('0x' + code[-1], 16) == SignalFree:
+#         code = code[:-1]
+#
+#     for step in code[4:]:
+#         step = int('0x' + step, 16)
+#         duration = step * carrier
+#         raw += [step]
+#
+#
 def ir_to_pronto_raw(freq, data):
     if freq <= 0:
         freq = 36000
@@ -316,3 +345,49 @@ def round_and_pack_timings(timing_data):
         out += pack("i", newVal)
 
     return out
+
+
+if __name__ == '__main__':
+
+    freq, transmit_values = pronto_to_mce('0000 0067 0000 000d 0060 0018 0030 0018 0018 0018 0030 0018 0018 0018 0030 0018 0018 0018 0018 0018 0018 0018 0018 0018 0018 0018 0018 0018 0030 0409')
+    transmit_code = round_and_pack_timings(transmit_values)
+    header = pack(7 * "q", 2, int(1000000. / freq), 0, 0, 0, 1, len(transmit_code))
+
+    print repr(header)
+    print repr(transmit_code)
+    print transmit_values
+
+    import ctypes
+
+
+    ptr = ctypes.cast((ctypes.c_char * len(transmit_code))(*list(transmit_code)), ctypes.POINTER(ctypes.c_long))
+
+    result = []
+    for i in range(len(transmit_code)):
+        result += [ptr[i]]
+
+    print result
+
+
+    print
+    print
+    ptr = ctypes.cast((ctypes.c_char * 8)('\x02', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'), ctypes.POINTER(ctypes.c_ulonglong))
+    print ptr.contents.value
+    ptr = ctypes.cast((ctypes.c_char * 8)('\x18', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'), ctypes.POINTER(ctypes.c_ulonglong))
+    print ptr.contents.value
+    ptr = ctypes.cast((ctypes.c_char * 8)('\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'), ctypes.POINTER(ctypes.c_ulonglong))
+    print ptr.contents.value
+    ptr = ctypes.cast((ctypes.c_char * 8)('\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'), ctypes.POINTER(ctypes.c_ulonglong))
+    print ptr.contents.value
+
+    print
+    ptr = ctypes.cast((ctypes.c_char * 8)('\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'), ctypes.POINTER(ctypes.c_ulonglong))
+    print ptr.contents.value
+    ptr = ctypes.cast((ctypes.c_char * 8)('\x01', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'), ctypes.POINTER(ctypes.c_ulonglong))
+    print ptr.contents.value
+    ptr = ctypes.cast((ctypes.c_char * 8)('h', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00', '\x00'), ctypes.POINTER(ctypes.c_ulonglong))
+    print ptr.contents.value
+    print
+
+    print int(1000000. / freq)
+    print len(transmit_code)

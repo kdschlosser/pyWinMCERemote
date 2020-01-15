@@ -27,25 +27,26 @@ project https://github.com/kdschlosser/pyWinMCERemote
 .. moduleauthor:: Kevin Schlosser @kdschlosser <kevin.g.schlosser@gmail.com>
 """
 
-try:
-    from . import ioctl
-    get_ir_devices = ioctl.get_ir_devices
-    IRDevice = ioctl.IRDevice
 
-except ImportError:
-    pass
+def read_file(file_name):
+    import os
+
+    base_path = os.path.dirname(__file__)
+
+    try:
+        path = os.path.join(base_path, file_name)
+
+        with open(path, 'r') as f:
+            return f.read()
+    except IOError:
+        return ''
 
 
-from . import version
-
-
-__version__ = version.__version__
-__author__ = version.__author__
-__url__ = version.__url__
-__description__ = version.__description__
-__author_email__ = version.__author_email__
-__license__ = version.__license__
-__long_description__ = version.__long_description__
-
-__doc__ += '\n ' + __long_description__
+__version__ = '0.1.0'
+__author__ = 'Kevin Schlosser'
+__url__ = 'https://github.com/kdschlosser/pyWinMCERemote'
+__description__ = 'An impossibly simple Python binding to the Windows Ehome CIR Remote API'
+__author_email__ = 'kevin.g.schlosser@gmail.com'
+__long_description__ = read_file('README.md')
+__license__ = read_file('LICENSE')
 

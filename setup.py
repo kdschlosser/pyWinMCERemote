@@ -16,5 +16,39 @@
 # You should have received a copy of the GNU General Public License along
 # with EventGhost. If not, see <http://www.gnu.org/licenses/>.
 
-comtypes
-six
+"""
+This file is part of the **pyWinMCERemote**
+project https://github.com/kdschlosser/pyWinMCERemote
+
+:platform: Windows
+:license: GPL version 2 or newer
+:synopsis: setup program
+
+.. moduleauthor:: Kevin Schlosser @kdschlosser <kevin.g.schlosser@gmail.com>
+"""
+
+
+from distutils.core import setup
+
+from pyWinMCERemote import (
+    __version__,
+    __author__,
+    __url__,
+    __description__,
+    __author_email__,
+    __long_description__,
+    __license__
+)
+
+setup(
+    name='pyWinMCERemote',
+    author_email=__author_email__,
+    author=__author__,
+    version=__version__,
+    url=__url__,
+    packages=['pyWinMCERemote', 'pyWinMCERemote.IRDecoder'],
+    description=__description__,
+    long_description=__long_description__,
+    license=__license__,
+    requires=['comtypes', 'six'],
+)
